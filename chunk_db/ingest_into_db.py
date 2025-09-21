@@ -46,7 +46,7 @@ def ingest_chunks():
 
         try:
             doc = load_data(file_path)
-            chunks = chunk_data(doc, chunk_overlap=100, separators=["\n\n", "\n", ". ", ": ", " - ", "• ", ", "])
+            chunks = chunk_data(doc, chunk_overlap=120, separators=["\n\n", "\n", ". ", "! ", "? ", "; ", ": ", "• ", " - ", ", "])
 
             for chunk in chunks:
                 cursor.execute(
