@@ -1,6 +1,8 @@
 # It's a simple utility to download all data (pdfs) from the sources json 
 
-# A BIG NOTE: src12 - Eaton safety manual... is too big for the utility to write, please get it manually and save in DATA PATH as src12.pdf 
+# A BIG NOTE:
+# src12 - Eaton safety manual... is too big for the utility to write, please get it manually and save in DATA PATH as src12.pdf
+# Also src03, src14 and src15 weren't downloadable by this utility. so add them manually. 
 
 
 import os, requests, json

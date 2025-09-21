@@ -1,24 +1,18 @@
-import pymupdf as pdf, os
-from tqdm import tqdm
+import pymupdf as pdf
 from typing import List
 
-def load_from_src(src_dir: str = "sourced_data"):
-    all_docs = []
-    if os.path.exists(src_dir):
-        for file in tqdm(os.listdir(src_dir), desc=f"Loading documents from {src_dir}"):
-            try:
-                file_path = os.path.join(src_dir, file)
-                doc = pdf.open(file_path)
-                all_docs.extend(doc)
-                print(f"Loaded document successfully - {file}")
-            except Exception as e:
-                print(f"Error loading document {file} - {e}")
+def load_data(document):
+    full_text = ""
+    try:
+        doc = pdf.open(document)
+        for page in doc:
+            content = page.get_text()
+            if content.strip():
+                full_text += content.strip() + "\n\n"
+    except Exception as e:
+        print(f"Error loading PDF from {document} : {e}")
 
-    return all_docs
-
-def load_data(doc):
-    full_text = "\n\n".join([page.get_text() for page in doc])
-    return full_text
+    return full_text.strip()
     
 
 def chunk_data(text, chunk_size: int = 400, chunk_overlap: int = 50, separators: List[str] = None):
