@@ -11,13 +11,15 @@ from tqdm import tqdm
 DATA_PATH = "sourced_data"
 os.makedirs(DATA_PATH, exist_ok=True)
 
-def load_srcs(file_path:str="sources.json"):
+def load_data_source(file_path:str="sources.json"):
+    """Load the sources JSON file."""
     with open(file_path, "r", encoding="utf-8") as data_src:
         sources = json.load(data_src)
         return sources
 
 def download_and_save_files():
-    sources = load_srcs()
+    """Use requests to download the PDFs given in `sources` file"""
+    sources = load_data_source()
 
     for src in tqdm(sources, desc="Downloading Data from Sources file..."):
         file_id = src["id"]

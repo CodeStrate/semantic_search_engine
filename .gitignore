@@ -209,3 +209,4 @@ __marimo__/
 # Ignore DB and PDF files
 *.db
 *.pdf
+chroma_db

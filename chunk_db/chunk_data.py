@@ -2,6 +2,7 @@ import pymupdf as pdf
 from typing import List
 
 def load_data(document):
+    """A simple data loader using PyMuPDF/fitz. '\n\n' is for paragraph separation per page."""
     full_text = ""
     try:
         doc = pdf.open(document)
