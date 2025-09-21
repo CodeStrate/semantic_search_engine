@@ -37,6 +37,7 @@ def create_metadata(chunk_id: int, source_id: str):
 
 
 def encode_and_add_to_chroma(rows: Tuple[int, str, str]):
+    """We use ChromaDB to embed the chunk rows and add them to a persistent DB on disk."""
     VECTOR_DB_PATH = "chroma_db"
     docs, metas, ids = [], [], []
     chroma_client = PersistentClient(path=VECTOR_DB_PATH)
@@ -48,13 +49,11 @@ def encode_and_add_to_chroma(rows: Tuple[int, str, str]):
 
     # in case of default embedding, we dont need to provide it anything for embedding_function
     try:
-        vector_store = chroma_client.create_collection("qna_data", configuration= {
-            "hnsw" : {"space" : "cosine"}
-        })
+        vector_store = chroma_client.create_collection("qna_data")
         # we couldn't see any progress + dataset is large so batching is a good fix
 
-        for i in tqdm(range(0, len(docs), 100), desc="Adding docs to ChromaDB"):
-            batch_ids, batch_metas, batch_docs = ids[i:i+100], metas[i:i+100], docs[i:i+100]
+        for i in tqdm(range(0, len(docs), 200), desc="Adding docs to ChromaDB"):
+            batch_ids, batch_metas, batch_docs = ids[i:i+200], metas[i:i+200], docs[i:i+200]
             vector_store.add(
             ids= batch_ids,
             documents= batch_docs,
