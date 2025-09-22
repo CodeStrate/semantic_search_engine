@@ -40,65 +40,62 @@ def load_data(document):
 
 def clean_ocr_text(text: str) -> str:
     """
-    Enhanced OCR cleaning for technical documents with machinery safety content.
+    OCR cleaning for the PDF data.
     Handles common OCR artifacts, formatting issues, and technical document quirks.
     """
     # Step 1: Fix hyphenated line breaks
     text = re.sub(r'-\s*\n\s*', '', text)
-    
+
+    # Fix single char cutoffs
+    text = re.sub(r'\b([a-zA-Z])\s*\n', r'\1', text)
+
     # Step 2: Remove table of contents lines (dots + page numbers)
     text = re.sub(r'^.*\.{3,}.*?\d+\s*$', '', text, flags=re.MULTILINE)
-    
+
     # Step 3: Remove standalone page numbers and section numbers
     text = re.sub(r'^\s*\d+\s*$', '', text, flags=re.MULTILINE)
-    text = re.sub(r'^\s*\d+\.\d+\s*$', '', text, flags=re.MULTILINE)  # Remove "8.34" style numbers
-    
-    # Step 4: Fix broken lines (not after sentence endings, not before bullets)
+    text = re.sub(r'^\s*\d+\.\d+\s*$', '', text, flags=re.MULTILINE)
+
+    # Step 4: Fix broken lines
     text = re.sub(r'(?<![.!?:])\n(?!\s*[•\-\d])', ' ', text)
-    
-    # Step 5: Clean OCR artifacts and encoding issues
-    text = re.sub(r'\xa0', ' ', text)  # Replace non-breaking spaces
-    text = re.sub(r'\u2003', ' ', text)  # Replace em spaces
-    text = re.sub(r'[\u2000-\u200f]', ' ', text)  # Replace various Unicode spaces
-    text = re.sub(r'[\u2010-\u2015]', '-', text)  # Normalize dashes
-    
+
+    # Step 5: Clean OCR artifacts
+    text = re.sub(r'\xa0', ' ', text)
+    text = re.sub(r'\u2003', ' ', text)
+    text = re.sub(r'[\u2000-\u200f]', ' ', text)
+    text = re.sub(r'[\u2010-\u2015]', '-', text)
+
     # Step 6: Fix common OCR letter substitutions
-    text = re.sub(r'\bngerous\b', 'dangerous', text)  # "ngerous" -> "dangerous"
-    text = re.sub(r'\bo new\b', 'no new', text)  # "o new" -> "no new"
-    
-    # Step 7: Clean up scientific notation and technical formatting
-    text = re.sub(r'(\d+)\s*·\s*(\d+)', r'\1 × \2', text)  # "2.1 · 10-7" -> "2.1 × 10"
-    text = re.sub(r'(\d+)-(\d+)', r'\1^-\2', text)  # Fix exponents "10-7" -> "10^-7"
-    
-    # Step 8: Normalize bullet points and numbered lists
+    text = re.sub(r'\bngerous\b', 'dangerous', text)
+    text = re.sub(r'\bo new\b', 'no new', text)
+
+    # Step 7: Clean up scientific notation
+    text = re.sub(r'(\d+)\s*·\s*(\d+)', r'\1 × \2', text)
+    text = re.sub(r'(\d+)-(\d+)', r'\1^-\2', text)
+
+    # Step 8: Normalize bullets and numbered lists
     text = re.sub(r'^\s*[•▪▫‣⁃]\s*', '• ', text, flags=re.MULTILINE)
     text = re.sub(r'^\s*[-]\s+', '• ', text, flags=re.MULTILINE)
-    text = re.sub(r'^\s*(\d+)\.\s+', r'\1. ', text, flags=re.MULTILINE)  # Normalize numbered lists
-    
+    text = re.sub(r'^\s*(\d+)\.\s+', r'\1. ', text, flags=re.MULTILINE)
+
     # Step 9: Fix figure/table references
     text = re.sub(r'Figure\s+(\d+)\.(\d+):', r'Figure \1.\2:', text)
     text = re.sub(r'Table\s+(\d+)\.(\d+):', r'Table \1.\2:', text)
-    
-    # Step 10: Clean excessive whitespace
-    text = re.sub(r'\n{3,}', '\n\n', text)  # Max 2 newlines
-    text = re.sub(r' {2,}', ' ', text)      # Max 1 space
-    text = re.sub(r'\t+', ' ', text)        # Replace tabs with single space
-    
-    # Step 11: Remove very short standalone lines (likely OCR artifacts)
+
+    # Step 10: Whitespace normalization
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    text = re.sub(r' {2,}', ' ', text)
+    text = re.sub(r'\t+', ' ', text)
+
+    # Step 11: Remove short OCR junk lines
     lines = []
     for line in text.split('\n'):
         line = line.strip()
-        # Keep lines that are either long enough or contain important markers
         if len(line) > 5 or any(marker in line.lower() for marker in ['figure', 'table', '•', 'pl ']):
             lines.append(line)
-    
     text = '\n'.join(lines)
-    
-    # Step 12: Final cleanup - remove leading/trailing whitespace
-    text = text.strip()
-    
-    return text
-    
+
+    return text.strip()    
 
 def chunk_data(text, chunk_size: int = 400, chunk_overlap: int = 100, separators: List[str] = None):
     """
@@ -107,7 +104,7 @@ def chunk_data(text, chunk_size: int = 400, chunk_overlap: int = 100, separators
     Args:
         text: Document text to split
         chunk_size: Maximum chunk size in characters (default: 400)
-        chunk_overlap: Number of characters to overlap (default: 100 - recommended for technical docs) 
+        chunk_overlap: Number of characters to overlap (default: 100)
         separators: List of separators to try in order (optional)
     
     Returns:
@@ -136,17 +133,30 @@ def chunk_data(text, chunk_size: int = 400, chunk_overlap: int = 100, separators
                 chunks.append(chunk)
             break
         
-        # Try to find a good break point using separators
-        best_split = end
-        for separator in separators:
+        # Try to find the BEST break point using separators
+        best_split = end  # Default to hard cut
+        best_separator_priority = len(separators)  # Lower is better
+        
+        for i, separator in enumerate(separators):
             split_pos = text.rfind(separator, start, end)
             if split_pos > start:
-                best_split = split_pos + len(separator)
-                break
+                # Prefer splits closer to our target size, but respect separator priority
+                distance_from_target = abs((split_pos + len(separator)) - end)
+                
+                # Only consider this split if:
+                # 1. It's a higher priority separator, OR
+                # 2. It's the same priority but closer to target size
+                if (i < best_separator_priority or 
+                    (i == best_separator_priority and distance_from_target < abs(best_split - end))):
+                    best_split = split_pos + len(separator)
+                    best_separator_priority = i
         
         # Extract chunk
         chunk = text[start:best_split].strip()
-        if chunk and len(chunk) > 10:
+        
+        # Only add chunks that are substantial (avoid tiny fragments)
+        min_chunk_size = max(50, chunk_size // 8)  # At least 50 chars or 1/8 of target size
+        if chunk and len(chunk) >= min_chunk_size:
             chunks.append(chunk)
         
         # Calculate next start position with overlap

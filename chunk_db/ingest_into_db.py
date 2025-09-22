@@ -1,8 +1,7 @@
 import sqlite3, os
-from utils.get_sqlite_connection import get_conn_and_cursor
+from utils.common_utils import get_conn_and_cursor, load_data_source
 from tqdm import tqdm
 from chunk_db.chunk_data import load_data, chunk_data
-from utils.download_source_data import load_data_source
 
 sources = load_data_source()
 
@@ -46,7 +45,7 @@ def ingest_chunks():
 
         try:
             doc = load_data(file_path)
-            chunks = chunk_data(doc, chunk_overlap=120, separators=["\n\n", "\n", ". ", "! ", "? ", "; ", ": ", "• ", " - ", ", "])
+            chunks = chunk_data(doc, separators=["\n\n", "\n", ". ", "! ", "? ", "; ", ": ", "•","• ", " - ", ", "])
 
             for chunk in chunks:
                 cursor.execute(

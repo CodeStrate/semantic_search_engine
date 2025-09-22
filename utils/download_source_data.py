@@ -5,17 +5,12 @@
 # Also src03, src14 and src15 weren't downloadable by this utility. so add them manually. 
 
 
-import os, requests, json
+import os, requests
 from tqdm import tqdm 
+from utils.common_utils import load_data_source
 
 DATA_PATH = "sourced_data"
 os.makedirs(DATA_PATH, exist_ok=True)
-
-def load_data_source(file_path:str="sources.json"):
-    """Load the sources JSON file."""
-    with open(file_path, "r", encoding="utf-8") as data_src:
-        sources = json.load(data_src)
-        return sources
 
 def download_and_save_files():
     """Use requests to download the PDFs given in `sources` file"""

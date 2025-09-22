@@ -1,4 +1,4 @@
-from utils.get_sqlite_connection import get_conn_and_cursor
+from utils.common_utils import get_conn_and_cursor
 
 def check_source_chunks_in_db():
     """Test script/query to check the data was inserted correctly."""

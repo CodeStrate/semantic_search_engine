@@ -1,6 +1,5 @@
-from utils.get_sqlite_connection import get_conn_and_cursor
+from utils.common_utils import get_conn_and_cursor, load_data_source
 from typing import Tuple
-from utils.download_source_data import load_data_source
 from chromadb import PersistentClient
 from tqdm import tqdm
 
