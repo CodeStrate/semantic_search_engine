@@ -3,8 +3,8 @@ from typing import Literal
 
 class QnAModel(BaseModel):
     query: str = Field(..., description="User's query to the System")
-    k: int = Field(..., description="Number of k Chunks to retrieve as an answer", default=3)
-    mode: Literal["baseline", "hybrid"] = Field(..., description="Mode of chunk retrieval (base retrieve or hybrid reranking)", default="baseline")
+    k: int = Field(default=5, description="Number of k Chunks to retrieve as an answer")
+    mode: Literal["baseline", "hybrid-bm25"] = Field(default="baseline", description="Mode of chunk retrieval (base retrieve or hybrid-bm25 reranking)")
 
     model_config = ConfigDict(
         from_attributes=True,
