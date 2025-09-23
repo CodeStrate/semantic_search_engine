@@ -7,10 +7,10 @@
     - Added a tester function to check how well the chunker works in `debug/test_chunking`.
 - [x] Added chunked data into an SQLite DB. Also added a small query script to validate src and chunks.
 - [x] Added `ChromaDB` as my vector store. Why? it embeds queries and chunks on its own using `all-MiniLM-L6-v2` by default. So, we dont require `SentenceTransformers` and its dependencies. saving on project library weightage.
-- [x] Added a `BM25` reranker using `bm25s` library.
 - [x] Added a baseline Search from the vector DB. Simple cosine top-k.
+- [x] Added a `BM25` reranker using `bm25s` library.
 - [x] Added `/ask` API endpoint using FastAPI Backend and Pydantic for validation.
 - [ ] Remaining Tasks :
-    - adding a function to `abstain` responses.
+    - ~~adding a function to `abstain` responses.~~ Done
     - a function to return 2-3 sentences from either search/reranker.
     - Completing the `/ask` endpoint.

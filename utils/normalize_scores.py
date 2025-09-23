@@ -1,6 +1,7 @@
 import numpy as np
 
 def normalize_scores(scores) -> np.ndarray:
+    """A normalizer made for the doc_scores (array)"""
     scores = np.array(scores, dtype=float)
     max_v = scores.max()
     min_v = scores.min()

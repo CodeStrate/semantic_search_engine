@@ -1,13 +1,20 @@
 from bm25s import tokenize, BM25
-from vector_db.baseline_search import cosine_search
+from vector_db.baseline_search import cosine_search, filter_results_by_threshold
 import numpy as np
 import random
 from utils.normalize_scores import normalize_scores
+from utils.retrieval_utils import query_result_with_citations
 
 random.seed(42) # seed to force deterministic answers from reranking
 
 def hybrid_reranking(query:str, k:int=30, alpha:float=0.6):
     res = cosine_search(query, k)
+
+    # Apply abstinence filter - if query is off-topic, return empty
+    filtered_res = filter_results_by_threshold(res)
+    if filtered_res['documents'] == [[]]:  # If abstained
+        return []
+    
     docs, metas, distances = res['documents'][0], res['metadatas'][0], res['distances'][0]
     # 1. we need scores and normalized (0-1) current distance is closer/lower = better , scores are higher = better so we flip 1 - dist
     vec_scores = 1 - np.array(distances)
@@ -37,6 +44,7 @@ def hybrid_reranking(query:str, k:int=30, alpha:float=0.6):
 
 if __name__ == '__main__':
     res = hybrid_reranking(query="What is OSHA?")
-    print(res)
+    #testing
+    print(query_result_with_citations(res))
 
 

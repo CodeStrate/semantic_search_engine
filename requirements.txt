@@ -6,3 +6,4 @@ tqdm
 scipy
 numpy
 bm25s # it is based on scipy and is faster than rank-bm25
+pyspellchecker

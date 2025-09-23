@@ -1,5 +1,6 @@
 from chromadb import PersistentClient
 from collections import defaultdict
+from utils.retrieval_utils import query_result_with_citations
 
 # like in ingestion we can query chromadb directly and it will embed our query text automatically using all-MiniLM
 
@@ -26,10 +27,18 @@ def filter_results_by_threshold(results, threshold:float=0.6):
         if dist <= threshold:
             filtered_results["documents"].append(results["documents"][0][i])
             filtered_results["metadatas"].append(results["metadatas"][0][i])
-            filtered_results["distance"].append(dist)
+            filtered_results["distances"].append(dist)
 
-    return filtered_results
+    # Abstain if nothing passed
+    if not filtered_results["documents"]:
+        return {"documents": [[]], "metadatas": [[]], "distances": [[]]}
 
+    return {"documents": [filtered_results["documents"]],
+            "metadatas": [filtered_results["metadatas"]],
+            "distances": [filtered_results["distances"]]}
+
+
+# testing
 if __name__ == '__main__':
-    res = cosine_search(query="What is OSHA?", k=5)
-    print(res)
+    res = cosine_search(query="how are you", k=5)
+    print(query_result_with_citations(filter_results_by_threshold(res)))
