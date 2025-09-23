@@ -16,7 +16,7 @@ def cosine_search(query: str, k: int):
 
     return results
 
-def filter_results_by_threshold(results, threshold:float=0.6):
+def filter_results_by_threshold(results, threshold:float=0.9):
 
     filtered_results = defaultdict(list)
 

@@ -1,0 +1,12 @@
+DETAILED COMPARISON:
+----------------------------------------
+                                          Q                                    Baseline Answer                                      Hybrid Answer  B_Src  H_Src  B_Score  H_Score  Same
+                           What is OSHA?... Occupational Safety and Health Administration I... Occupational Safety and Health Administration I...      3      3    0.496      1.0  True
+   What are the main safety regulations?... Laws, regulations, directives, standards Summar... Laws, regulations, directives, standards Summar...      3      3    0.437      1.0  True
+             Define workplace ergonomics... Aces [53]; and EN ISO 9241^-11, Ergonomics of h... Aces [53]; and EN ISO 9241^-11, Ergonomics of h...      1      3    0.232      1.0 False
+               What is machinery safety?... ^-1) References [1] EN 954^-1: Safety of machin... ^-1) References [1] EN 954^-1: Safety of machin...      3      3    0.554      1.0  True
+                What is the role of PPE?... An effective PPE program means more than simply... An effective PPE program means more than simply...      3      3    0.382      1.0  True
+What are some U.S. regulatory requiremen... More specific requirements for certain categori... More specific requirements for certain categori...      3      3    0.307      1.0  True
+   What are common hazards of wood dust?... Myers must provide PPE as a supplement to these... Myers must provide PPE as a supplement to these...      3      3    0.518      1.0  True
+    Who enforces safety laws in Ontario?... He Occupational Health and Safety Act provides ... He Occupational Health and Safety Act provides ...      3      3    0.371      1.0  True
+
